@@ -10,8 +10,10 @@
 <body>
     <div class="container">
         <header>
+            <img src="./image/logo_white.png" alt="Engate Logo" class="header-logo">
             <h1>Engate資料ライブラリ</h1>
             <p>アスリート向けのサービス資料と動画コンテンツをご覧いただけます</p>
+            <button id="admin-login-btn" class="admin-login-btn">管理者ログイン</button>
         </header>
 
         <div class="tabs">
@@ -32,6 +34,52 @@
                 <div class="videos-grid">
                     <!-- モックデータの動画がここに挿入されます -->
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- パスワード入力モーダル -->
+    <div id="password-modal" class="password-modal">
+        <div class="modal-content">
+            <h3>管理者認証</h3>
+            <p>パスワードを入力してください</p>
+            <input type="password" id="password-input" placeholder="パスワード">
+            <div class="modal-buttons">
+                <button id="login-submit" class="modal-btn primary">ログイン</button>
+                <button id="login-cancel" class="modal-btn secondary">キャンセル</button>
+            </div>
+            <div id="error-message" class="error-message"></div>
+        </div>
+    </div>
+
+    <!-- ファイルアップロードモーダル -->
+    <div id="upload-modal" class="password-modal">
+        <div class="modal-content">
+            <h3 id="upload-modal-title">ファイルアップロード</h3>
+            <p id="upload-modal-description">新しいファイルを選択してください</p>
+            <div class="upload-area">
+                <input type="file" id="file-input" accept=".pdf,.mp4,.mov,.avi" style="display: none;">
+                <div id="drop-zone" class="drop-zone">
+                    <div class="drop-zone-content">
+                        <span class="upload-icon">📁</span>
+                        <p>クリックまたはドラッグ＆ドロップでファイルを選択</p>
+                        <p class="file-types">PDF、動画ファイル対応</p>
+                    </div>
+                </div>
+                <div id="file-preview" class="file-preview" style="display: none;">
+                    <span id="file-name"></span>
+                    <button id="remove-file" class="remove-file-btn">×</button>
+                </div>
+            </div>
+            <div class="modal-buttons">
+                <button id="upload-submit" class="modal-btn primary" disabled>アップロード</button>
+                <button id="upload-cancel" class="modal-btn secondary">キャンセル</button>
+            </div>
+            <div id="upload-progress" class="upload-progress" style="display: none;">
+                <div class="progress-bar">
+                    <div id="progress-fill" class="progress-fill"></div>
+                </div>
+                <span id="progress-text">0%</span>
             </div>
         </div>
     </div>
