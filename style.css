@@ -674,3 +674,53 @@ header p {
     font-size: 14px;
     font-weight: 500;
 }
+
+/* YouTube入力エリア */
+.youtube-input-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.youtube-input-container label {
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
+    font-size: 15px;
+}
+
+.youtube-input {
+    width: 100%;
+    padding: 15px;
+    border: 2px solid rgba(255, 107, 53, 0.3);
+    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.3);
+    color: white;
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+.youtube-input:focus {
+    border-color: #ff6b35;
+    box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.2);
+}
+
+.youtube-input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.youtube-preview {
+    margin-top: 15px;
+}
+
+.youtube-preview p {
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 10px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.youtube-preview iframe {
+    border-radius: 12px;
+    border: 1px solid rgba(255, 107, 53, 0.3);
+}

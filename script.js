@@ -110,7 +110,7 @@ function downloadPdf(url, filename) {
 
 // 管理者モード状態
 let isAdminMode = false;
-const ADMIN_PASSWORD = "Engate0226";
+const ADMIN_PASSWORD = "Engate2025";
 
 // 管理者認証機能
 function showPasswordModal() {
@@ -207,16 +207,27 @@ function uploadPdf(id) {
 function uploadVideo(id) {
     currentUploadType = 'video';
     currentUploadId = id;
-    showUploadModal('動画', '動画');
+    showUploadModal('動画', 'YouTube');
 }
 
 function showUploadModal(type, fileType) {
     const modal = document.getElementById('upload-modal');
     const title = document.getElementById('upload-modal-title');
     const description = document.getElementById('upload-modal-description');
+    const pdfArea = document.getElementById('pdf-upload-area');
+    const videoArea = document.getElementById('video-upload-area');
     
     title.textContent = `${type}をアップロード`;
-    description.textContent = `新しい${fileType}ファイルを選択してください`;
+    
+    if (currentUploadType === 'pdf') {
+        description.textContent = `新しい${fileType}ファイルを選択してください`;
+        pdfArea.style.display = 'block';
+        videoArea.style.display = 'none';
+    } else {
+        description.textContent = `新しい${fileType}リンクを入力してください`;
+        pdfArea.style.display = 'none';
+        videoArea.style.display = 'block';
+    }
     
     modal.style.display = 'flex';
     resetUploadModal();
@@ -229,9 +240,16 @@ function hideUploadModal() {
 }
 
 function resetUploadModal() {
+    // PDF関連のリセット
     document.getElementById('file-input').value = '';
     document.getElementById('file-preview').style.display = 'none';
     document.getElementById('drop-zone').style.display = 'block';
+    
+    // YouTube関連のリセット
+    document.getElementById('youtube-url').value = '';
+    document.getElementById('youtube-preview').style.display = 'none';
+    
+    // 共通のリセット
     document.getElementById('upload-submit').disabled = true;
     document.getElementById('upload-progress').style.display = 'none';
 }
@@ -250,7 +268,7 @@ function handleFileSelect(file) {
     submitBtn.disabled = false;
 }
 
-function simulateUpload(file) {
+function simulateUpload(fileOrUrl) {
     const progressDiv = document.getElementById('upload-progress');
     const progressFill = document.getElementById('progress-fill');
     const progressText = document.getElementById('progress-text');
@@ -270,8 +288,13 @@ function simulateUpload(file) {
         if (progress >= 100) {
             clearInterval(interval);
             setTimeout(() => {
-                // ファイルを実際に保存（ローカルストレージまたは実際のアップロード）
-                saveUploadedFile(file);
+                if (currentUploadType === 'video') {
+                    // YouTubeリンクの場合
+                    saveYouTubeLink(fileOrUrl);
+                } else {
+                    // PDFファイルの場合
+                    saveUploadedFile(fileOrUrl);
+                }
                 hideUploadModal();
                 loadContent(); // UI更新
                 alert('アップロードが完了しました！');
@@ -312,9 +335,74 @@ function saveUploadedFile(file) {
     }
 }
 
+function saveYouTubeLink(url) {
+    const embedUrl = convertYouTubeUrl(url);
+    if (!embedUrl) return;
+    
+    // ローカルストレージに保存
+    const uploadedFiles = JSON.parse(localStorage.getItem('uploadedFiles') || '{}');
+    
+    const linkData = {
+        originalUrl: url,
+        embedUrl: embedUrl,
+        uploadDate: new Date().toISOString(),
+        contentType: currentUploadType,
+        id: currentUploadId
+    };
+    
+    if (!uploadedFiles[currentUploadType]) {
+        uploadedFiles[currentUploadType] = {};
+    }
+    
+    uploadedFiles[currentUploadType][currentUploadId] = linkData;
+    localStorage.setItem('uploadedFiles', JSON.stringify(uploadedFiles));
+    
+    // embed URLをコンテンツとして保存
+    const fileContent = JSON.parse(localStorage.getItem('uploadedFileContents') || '{}');
+    fileContent[`${currentUploadType}_${currentUploadId}`] = embedUrl;
+    localStorage.setItem('uploadedFileContents', JSON.stringify(fileContent));
+}
+
 function getUploadedFileUrl(type, id) {
     const fileContents = JSON.parse(localStorage.getItem('uploadedFileContents') || '{}');
     return fileContents[`${type}_${id}`] || null;
+}
+
+// YouTube URL変換機能
+function convertYouTubeUrl(url) {
+    if (!url) return null;
+    
+    // YouTube URLの各パターンに対応
+    const patterns = [
+        /(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/,
+        /(?:https?:\/\/)?(?:www\.)?youtu\.be\/([a-zA-Z0-9_-]+)/,
+        /(?:https?:\/\/)?(?:www\.)?youtube\.com\/embed\/([a-zA-Z0-9_-]+)/
+    ];
+    
+    for (const pattern of patterns) {
+        const match = url.match(pattern);
+        if (match) {
+            return `https://www.youtube.com/embed/${match[1]}`;
+        }
+    }
+    
+    return null;
+}
+
+function handleYouTubeInput(url) {
+    const embedUrl = convertYouTubeUrl(url);
+    const preview = document.getElementById('youtube-preview');
+    const previewIframe = document.getElementById('youtube-preview-iframe');
+    const submitBtn = document.getElementById('upload-submit');
+    
+    if (embedUrl) {
+        previewIframe.src = embedUrl;
+        preview.style.display = 'block';
+        submitBtn.disabled = false;
+    } else {
+        preview.style.display = 'none';
+        submitBtn.disabled = true;
+    }
 }
 
 // ページ読み込み時に実行
@@ -343,9 +431,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // アップロードモーダルのイベントリスナー
     document.getElementById('upload-cancel').addEventListener('click', hideUploadModal);
     document.getElementById('upload-submit').addEventListener('click', () => {
-        const fileInput = document.getElementById('file-input');
-        if (fileInput.files[0]) {
-            simulateUpload(fileInput.files[0]);
+        if (currentUploadType === 'pdf') {
+            const fileInput = document.getElementById('file-input');
+            if (fileInput.files[0]) {
+                simulateUpload(fileInput.files[0]);
+            }
+        } else {
+            const youtubeUrl = document.getElementById('youtube-url').value;
+            if (youtubeUrl) {
+                simulateUpload(youtubeUrl);
+            }
         }
     });
     
@@ -384,6 +479,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // ファイル削除
     document.getElementById('remove-file').addEventListener('click', () => {
         resetUploadModal();
+    });
+    
+    // YouTube URL入力のイベントリスナー
+    const youtubeInput = document.getElementById('youtube-url');
+    youtubeInput.addEventListener('input', (e) => {
+        handleYouTubeInput(e.target.value);
+    });
+    
+    youtubeInput.addEventListener('paste', (e) => {
+        setTimeout(() => {
+            handleYouTubeInput(e.target.value);
+        }, 100);
     });
     
     // アップロードモーダル外クリックで閉じる
