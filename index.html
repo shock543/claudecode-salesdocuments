@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Engate資料ライブラリ</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Engate資料ライブラリ</h1>
+            <p>アスリート向けのサービス資料と動画コンテンツをご覧いただけます</p>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-button active" data-tab="pdf">PDF資料</button>
+            <button class="tab-button" data-tab="video">動画</button>
+        </div>
+
+        <div class="content">
+            <!-- PDF資料タブのコンテンツ -->
+            <div id="pdf-content" class="tab-content active">
+                <div class="documents-grid">
+                    <!-- モックデータのPDF資料がここに挿入されます -->
+                </div>
+            </div>
+
+            <!-- 動画タブのコンテンツ -->
+            <div id="video-content" class="tab-content">
+                <div class="videos-grid">
+                    <!-- モックデータの動画がここに挿入されます -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
